@@ -1,89 +1,15 @@
 use super::genetic_operators::*;
 
-use std::collections::BTreeMap;
+use super::model::*;
+
 use std::{cmp::Ordering, f32::consts::E};
 
-use rand::{distributions::Uniform, prelude::Distribution, seq::SliceRandom, thread_rng};
+use rand::seq::SliceRandom;
+use rand::{distributions::Uniform, prelude::Distribution, thread_rng};
 
-#[derive(PartialEq, Eq)]
-pub enum DeliveryType {
-    Pickup,
-    Delivery,
-}
-
-pub struct Node {
-    delivery_type: DeliveryType,
-    index: usize,
-}
-
-pub struct Route {
-    distance_travelled: f32,
-    time_delivery: usize,
-    num_delivery: usize,
-    nodes: Vec<Node>,
-}
-
-impl Route {
-    fn calc_distance(self, distance_matrix: Vec<Vec<f32>>) -> f32 {
-        self.nodes
-            .windows(2)
-            .map(|vals| {
-                if let [val1, val2] = vals {
-                    distance_matrix[val1.index][val2.index]
-                } else {
-                    unreachable!()
-                }
-            })
-            .sum()
-    }
-
-    fn calc_num_delivery(self) -> usize {
-        self.nodes
-            .iter()
-            .filter(|node| node.delivery_type == DeliveryType::Delivery)
-            .count()
-    }
-
-    fn isFeasible(self, item_size: BTreeMap<usize, i32>, bag_size: i32) -> bool {
-        let mut current_weight = self
-            .nodes
-            .iter()
-            .filter_map(|node| {
-                if node.delivery_type == DeliveryType::Delivery {
-                    Some(item_size.get(&node.index).unwrap())
-                } else {
-                    None
-                }
-            })
-            .sum::<i32>();
-
-        if current_weight > bag_size {
-            return false;
-        };
-
-        for node in self.nodes {
-            let node_weight = *item_size.get(&node.index).unwrap();
-            match node.delivery_type {
-                DeliveryType::Delivery => {
-                    current_weight -= node_weight;
-                }
-                DeliveryType::Pickup => {
-                    if node_weight + current_weight > bag_size {
-                        return false;
-                    }
-
-                    current_weight += node_weight
-                }
-            }
-        }
-
-        true
-    }
-}
-
-fn genetic_algorithm(
-    distance_matrix: Vec<Vec<f32>>,
-    time_matrix: Vec<Vec<f32>>,
+pub fn genetic_algorithm(
+    distance_matrix: &Vec<Vec<f32>>,
+    time_matrix: &Vec<Vec<f32>>,
     route: &Route,
 ) -> f32 {
     let population_size = 200;
