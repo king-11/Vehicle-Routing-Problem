@@ -14,9 +14,6 @@ pub struct Node {
 
 #[derive(Clone)]
 pub struct Route {
-    pub distance_travelled: f32,
-    pub time_delivery: usize,
-    pub num_delivery: usize,
     pub nodes: Vec<Node>,
 }
 
