@@ -1,5 +1,7 @@
 use std::f32::MAX;
 
+use itertools::Itertools;
+
 use super::genetic_algorithm::genetic_algorithm;
 
 use super::model::*;
@@ -15,12 +17,12 @@ pub fn clustering(node: Node, routes: &mut Vec<Route> ,distance_matrix: &Vec<Vec
 
     // does it matter of GA to have input in a particular order?
     temp_route.nodes.push(node);
+    let (cost, new_route) = genetic_algorithm(distance_matrix, time_matrix, &temp_route);
 
-    // pass by reference here, temp_route will have best arrangement.
+    let nodes = new_route.iter().map(|&idx| temp_route.nodes.iter().find(|node| node.index == idx).unwrap().clone()).collect_vec();
+    temp_route.nodes = nodes;
 
-    genetic_algorithm(distance_matrix, time_matrix, &temp_route);
-
-    let increased_cost = temp_route.calc_distance(distance_matrix) - route.calc_distance(distance_matrix);
+    let increased_cost = cost - route.calc_distance(distance_matrix);
     if increased_cost < min_increase {
       min_increase = increased_cost;
       min_rider_index = rider_index;

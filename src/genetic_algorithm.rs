@@ -11,7 +11,7 @@ pub fn genetic_algorithm(
     distance_matrix: &Vec<Vec<f32>>,
     time_matrix: &Vec<Vec<f32>>,
     route: &Route,
-) -> f32 {
+) -> (f32, Vec<usize>) {
     let population_size = 200;
     let iterations = 5000;
     let mutation_probability = 0.1;
@@ -108,6 +108,6 @@ pub fn genetic_algorithm(
             best_now = best.clone();
         }
     }
-    //
-    distance(&best_now)
+
+    (distance(&best_now), best_now)
 }
