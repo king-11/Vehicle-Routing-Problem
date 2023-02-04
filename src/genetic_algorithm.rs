@@ -14,6 +14,7 @@ pub fn genetic_algorithm(
 ) -> (f32, Vec<usize>) {
     let population_size = 200;
     let iterations = 5000;
+    // let iterations = 2;
     let mutation_probability = 0.1;
     let between = Uniform::from(0.0..1.0);
     let mut prng = thread_rng();
@@ -47,9 +48,13 @@ pub fn genetic_algorithm(
 
     let fitness_function = |path: &Vec<usize>| {
         let distance_travelleing = distance(path);
+        // dbg!(distance_travelleing);
         let time_taken = time_taken(path);
+        // dbg!(time_taken);
+        let fit_value = E.powf(-distance_travelleing) * (1.0 / 1.0 + time_taken);
+        // dbg!(fit_value);
 
-        E.powf(-distance_travelleing) * (1.0 / 1.0 + time_taken)
+        return fit_value; 
     };
 
     let mut population = (0..population_size)
@@ -85,11 +90,25 @@ pub fn genetic_algorithm(
             scramble_mutation(&mut child2, None);
         }
 
+        let debughoja = child1.to_vec();
+        let debugbhai = child2.to_vec();
+
         population.push(child1);
         population.push(child2);
 
+        // dbg!(debughoja);
+        // dbg!(debugbhai);
+        // println!("{}",child1[0]);
+
         let mut fitness_values = get_fitness_values(&population);
-        linear_scaling(&mut fitness_values, 1.2);
+
+        // let dbgkikoshish = fitness_values.to_vec();
+        // dbg!(dbgkikoshish);
+
+        // linear_scaling(&mut fitness_values, 1.2);
+
+        // let gg = fitness_values.to_vec();
+        // dbg!(gg);
 
         let selected_idx = stochastic_universal_selection(&fitness_values, population_size, None);
 
