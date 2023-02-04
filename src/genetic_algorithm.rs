@@ -18,7 +18,9 @@ pub fn genetic_algorithm(
     let between = Uniform::from(0.0..1.0);
     let mut prng = thread_rng();
 
+    // TODO: use rider location for start and end not 0
     let distance = |path: &Vec<usize>| {
+        let end = *path.last().unwrap();
         path.windows(2)
             .map(|idxs| {
                 if let &[idx1, idx2] = idxs {
@@ -27,10 +29,11 @@ pub fn genetic_algorithm(
                     unreachable!()
                 }
             })
-            .sum::<f32>()
+            .sum::<f32>() + distance_matrix[0][path[0]] + distance_matrix[end][0]
     };
 
     let time_taken = |path: &Vec<usize>| {
+        let end = *path.last().unwrap();
         path.windows(2)
             .map(|idxs| {
                 if let &[idx1, idx2] = idxs {
@@ -39,7 +42,7 @@ pub fn genetic_algorithm(
                     unreachable!()
                 }
             })
-            .sum::<f32>()
+            .sum::<f32>() + time_matrix[0][path[0]] + time_matrix[end][0]
     };
 
     let fitness_function = |path: &Vec<usize>| {
