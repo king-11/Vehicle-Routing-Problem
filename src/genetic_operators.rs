@@ -33,8 +33,7 @@ pub fn stochastic_universal_selection(
         None => StdRng::from_entropy(),
     };
 
-    let mut random_offset = prng.gen_range(0.0..fitness_step);
-    let random_inital = random_offset;
+    let random_inital = prng.gen_range(0.0..fitness_step);
 
     let mut current_offset = 0usize;
     let mut selected_indices: Vec<usize> = Vec::new();
@@ -43,7 +42,6 @@ pub fn stochastic_universal_selection(
             current_offset += 1;
         }
         selected_indices.push(current_offset);
-        random_offset += fitness_step;
     }
 
     selected_indices
