@@ -27,18 +27,20 @@ fn radial_selection(
         None => StdRng::from_entropy(),
     };
 
-    let selected_node = routes
+    let nodes = routes
         .iter()
         .map(|route| &route.nodes)
         .flatten()
+        .collect_vec();
+
+    let selected_node = nodes
+        .iter()
         .choose(&mut prng)
         .unwrap();
 
-    routes
+    nodes
         .iter()
-        .map(|route| &route.nodes)
-        .flatten()
-        .filter_map(|node| {
+        .filter_map(|&node| {
             if node.index == selected_node.index {
                 None
             } else {
