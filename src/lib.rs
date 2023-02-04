@@ -1,9 +1,11 @@
-mod genetic_operators;
+pub mod genetic_operators;
 
-mod genetic_algorithm;
+pub mod genetic_algorithm;
 
-mod model;
+pub mod model;
 
-mod clustering;
+pub mod clustering;
 
-mod node_selection;
+pub mod node_selection;
+
+pub mod route_mutation;
