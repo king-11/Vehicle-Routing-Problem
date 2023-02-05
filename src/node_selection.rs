@@ -47,7 +47,7 @@ fn radial_selection(
                 Some((distance_matrix[node.index][selected_node.index], node))
             }
         })
-        .sorted_by_key(|(dist, _)| dist.partial_cmp(&0.0).unwrap())
+        .sorted_by(|(dist1, _), (dist2, _)| dist1.partial_cmp(dist2).unwrap())
         .map(|(_, node)| node)
         .take(k)
         .collect_vec()
@@ -77,7 +77,7 @@ fn costly_selection(routes: &Vec<Route>, distance_matrix: Vec<Vec<f32>>, k: usiz
 
     costs
         .iter()
-        .sorted_by_key(|(dist, _)| dist.partial_cmp(&0.0).unwrap())
+        .sorted_by(|(dist1, _), (dist2, _)| dist2.partial_cmp(dist1).unwrap())
         .map(|(_, node_index)| {
             routes
                 .iter()
