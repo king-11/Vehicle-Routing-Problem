@@ -1,7 +1,6 @@
-use std::cmp::Ordering;
+use std::{cmp::min, collections::BTreeSet};
 
-use std::cmp::min;
-
+use itertools::Itertools;
 use rand::{prelude::IteratorRandom, rngs::StdRng, Rng, SeedableRng};
 
 use std::mem::swap;
@@ -65,12 +64,12 @@ pub fn random_selection(
 pub fn linear_scaling(fitness_values: &mut Vec<f32>, scaling_factor: f32) {
     let minimum_fitness = fitness_values
         .iter()
-        .min_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal))
+        .min_by(|a, b| a.partial_cmp(b).unwrap())
         .unwrap();
 
     let maximum_fitness = fitness_values
         .iter()
-        .max_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Equal))
+        .max_by(|a, b| a.partial_cmp(b).unwrap())
         .unwrap();
 
     let average_fitness = fitness_values.iter().sum::<f32>() / (fitness_values.len() as f32);
@@ -115,7 +114,7 @@ pub fn scramble_mutation<T>(individual: &mut Vec<T>, seed: Option<u64>) {
     slice.shuffle(&mut prng);
 }
 
-pub fn partially_mapped_crossover(
+pub fn order_crossover(
     parent1: &Vec<usize>,
     parent2: &Vec<usize>,
     seed: Option<u64>,
@@ -128,28 +127,60 @@ pub fn partially_mapped_crossover(
 
     let mut selected = (0..n).map(|x| x).choose_multiple(&mut prng, 2);
     selected.sort();
-    let (mut idx1, mut idx2) = (parent1.clone(), parent2.clone());
-    for i in 0..n {
-        idx1[parent1[i]] = i;
-        idx2[parent2[i]] = i;
-    }
+
     let (mut child1, mut child2) = (parent1.clone(), parent2.clone());
+    let (mut set1, mut set2) = (BTreeSet::new(), BTreeSet::new());
 
     for i in selected[0]..=selected[1] {
-        let (val1, val2) = (child1[i], child2[i]);
+        set1.insert(child1[i]);
+        set2.insert(child2[i]);
+    }
 
-        child1[i] = val2;
-        child1[idx1[val2]] = val1;
-        child2[i] = val1;
-        child2[idx2[val1]] = val2;
+    let mut current_idx = 0;
+    for i in 0..n {
+        if (selected[0]..=selected[1]).contains(&i) {
+            continue;
+        }
 
-        let temp = (idx1[val1], idx1[val2]);
-        idx1[val1] = temp.1;
-        idx1[val2] = temp.0;
-        let temp = (idx2[val1], idx2[val2]);
-        idx2[val1] = temp.1;
-        idx2[val2] = temp.0;
+        while set1.contains(&parent2[current_idx]) {
+            current_idx += 1;
+        }
+
+        if current_idx < n {
+            set1.insert(parent2[current_idx]);
+            child1[i] = parent2[current_idx];
+        }
+    }
+
+
+    let mut current_idx = 0;
+    for i in 0..n {
+        if (selected[0]..=selected[1]).contains(&i) {
+            continue;
+        }
+        while set2.contains(&parent1[current_idx]) {
+            current_idx += 1;
+        }
+
+        if current_idx < n {
+            set2.insert(parent1[current_idx]);
+            child2[i] = parent1[current_idx];
+        }
     }
 
     (child1, child2)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::order_crossover;
+
+    #[test]
+    fn run_order() {
+        let parent1 = vec![1, 3, 4, 6, 0, 2, 7, 5];
+        let parent2 = vec![2, 3, 4, 0, 7, 6, 1, 5];
+        let (child1, child2) = order_crossover(&parent1, &parent2, Some(42));
+
+        dbg!(child1);
+    }
 }

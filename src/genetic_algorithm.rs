@@ -76,7 +76,7 @@ pub fn genetic_algorithm(
     for _ in 0..iterations {
         let idxs = random_selection(population_size, 2, None);
         let (mut child1, mut child2) =
-            partially_mapped_crossover(&population[idxs[0]], &population[idxs[1]], None);
+            order_crossover(&population[idxs[0]], &population[idxs[1]], None);
 
         if between.sample(&mut prng) < mutation_probability {
             scramble_mutation(&mut child1, None);
