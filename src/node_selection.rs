@@ -3,7 +3,7 @@ use rand::{rngs::StdRng, seq::IteratorRandom, SeedableRng};
 
 use crate::model::*;
 
-fn random_selection(routes: &Vec<Route>, k: usize, seed: Option<u64>) -> Vec<&Node> {
+pub fn random_selection(routes: &Vec<Route>, k: usize, seed: Option<u64>) -> Vec<&Node> {
     let mut prng = match seed {
         Some(val) => StdRng::seed_from_u64(val),
         None => StdRng::from_entropy(),
@@ -16,12 +16,12 @@ fn random_selection(routes: &Vec<Route>, k: usize, seed: Option<u64>) -> Vec<&No
         .choose_multiple(&mut prng, k)
 }
 
-fn radial_selection(
-    routes: &Vec<Route>,
-    distance_matrix: Vec<Vec<f32>>,
+pub fn radial_selection<'a>(
+    routes: &'a Vec<Route>,
+    distance_matrix: &Vec<Vec<f32>>,
     k: usize,
     seed: Option<u64>,
-) -> Vec<&Node> {
+) -> Vec<&'a Node> {
     let mut prng = match seed {
         Some(val) => StdRng::seed_from_u64(val),
         None => StdRng::from_entropy(),
@@ -33,10 +33,7 @@ fn radial_selection(
         .flatten()
         .collect_vec();
 
-    let selected_node = nodes
-        .iter()
-        .choose(&mut prng)
-        .unwrap();
+    let selected_node = nodes.iter().choose(&mut prng).unwrap();
 
     nodes
         .iter()
@@ -53,7 +50,11 @@ fn radial_selection(
         .collect_vec()
 }
 
-fn costly_selection(routes: &Vec<Route>, distance_matrix: Vec<Vec<f32>>, k: usize) -> Vec<&Node> {
+pub fn costly_selection<'a>(
+    routes: &'a Vec<Route>,
+    distance_matrix: &Vec<Vec<f32>>,
+    k: usize,
+) -> Vec<&'a Node> {
     let mut costs = vec![];
     let nodes = routes
         .iter()
