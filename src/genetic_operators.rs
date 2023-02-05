@@ -1,6 +1,5 @@
 use std::{cmp::min, collections::BTreeSet};
 
-use itertools::Itertools;
 use rand::{prelude::IteratorRandom, rngs::StdRng, Rng, SeedableRng};
 
 use std::mem::swap;
@@ -61,38 +60,27 @@ pub fn random_selection(
         .choose_multiple(&mut prng, min(num_parents, population_size))
 }
 
-pub fn linear_scaling(fitness_values: &mut Vec<f32>, scaling_factor: f32) {
-    let minimum_fitness = fitness_values
-        .iter()
-        .min_by(|a, b| a.partial_cmp(b).unwrap())
-        .unwrap();
+pub fn sigma_scaling(fitness_values: &mut Vec<f32>, scaling_factor: f32) {
+  let average_fitness = fitness_values.iter().sum::<f32>() / (fitness_values.len() as f32);
 
-    let maximum_fitness = fitness_values
-        .iter()
-        .max_by(|a, b| a.partial_cmp(b).unwrap())
-        .unwrap();
+  let standard_deviation = fitness_values
+    .iter()
+    .map(|x| (x - average_fitness).powi(2))
+    .sum::<f32>();
 
-    let average_fitness = fitness_values.iter().sum::<f32>() / (fitness_values.len() as f32);
+  let standard_deviation = (standard_deviation / (fitness_values.len() as f32)).sqrt();
 
-    if average_fitness == 0.0 {
-        for x in fitness_values {
-            *x = 1.0;
-        }
-        return;
+  let worst_fitness = average_fitness - standard_deviation * scaling_factor;
+  for x in fitness_values {
+    if *x <= worst_fitness {
+      *x = 0.0;
     }
-    let mut a = (average_fitness * (scaling_factor - 1.0)) / (maximum_fitness - average_fitness);
-    let mut b = (average_fitness * (maximum_fitness - scaling_factor * average_fitness))
-        / (maximum_fitness - average_fitness);
-
-    if *minimum_fitness <= -1.0 * b / a {
-        a = average_fitness / (average_fitness - minimum_fitness);
-        b = -1.0 * minimum_fitness * average_fitness / (average_fitness - minimum_fitness);
+    else {
+      *x = *x - worst_fitness;
     }
 
-    let linear_function = |x: f32| a * x + b;
-    for x in fitness_values {
-        *x = linear_function(*x);
-    }
+    *x = *x + 1.0;
+  }
 }
 
 pub fn scramble_mutation<T>(individual: &mut Vec<T>, seed: Option<u64>) {

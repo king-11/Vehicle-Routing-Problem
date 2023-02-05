@@ -89,7 +89,7 @@ pub fn genetic_algorithm(
         population.push(child2);
 
         let mut fitness_values = get_fitness_values(&population);
-        linear_scaling(&mut fitness_values, 1.2);
+        sigma_scaling(&mut fitness_values, 1.2);
 
         let selected_idx = stochastic_universal_selection(&fitness_values, population_size, None);
 
