@@ -130,7 +130,7 @@ pub fn order_crossover(
             continue;
         }
 
-        while set1.contains(&parent2[current_idx]) {
+        while current_idx < n && set1.contains(&parent2[current_idx]) {
             current_idx += 1;
         }
 
@@ -146,7 +146,7 @@ pub fn order_crossover(
         if (selected[0]..=selected[1]).contains(&i) {
             continue;
         }
-        while set2.contains(&parent1[current_idx]) {
+        while current_idx < n && set2.contains(&parent1[current_idx]) {
             current_idx += 1;
         }
 
