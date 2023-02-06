@@ -10,6 +10,8 @@ use rand::{distributions::Uniform, prelude::Distribution, thread_rng};
 pub fn genetic_algorithm(
     distance_matrix: &Vec<Vec<f32>>,
     time_matrix: &Vec<Vec<f32>>,
+    rider_matrix: &Vec<Vec<f32>>,
+    rider_index: usize,
     route: &Route,
 ) -> (f32, Vec<usize>) {
     let population_size = 200;
@@ -18,7 +20,6 @@ pub fn genetic_algorithm(
     let between = Uniform::from(0.0..1.0);
     let mut prng = thread_rng();
 
-    // TODO: use rider location for start and end not 0
     let distance = |path: &Vec<usize>| {
         let end = *path.last().unwrap();
         path.windows(2)
@@ -29,7 +30,7 @@ pub fn genetic_algorithm(
                     unreachable!()
                 }
             })
-            .sum::<f32>() + distance_matrix[0][path[0]] + distance_matrix[end][0]
+            .sum::<f32>() + rider_matrix[rider_index][path[0]] + distance_matrix[end][0]
     };
 
     let time_taken = |path: &Vec<usize>| {
@@ -42,14 +43,15 @@ pub fn genetic_algorithm(
                     unreachable!()
                 }
             })
-            .sum::<f32>() + time_matrix[0][path[0]] + time_matrix[end][0]
+            .sum::<f32>() + time_matrix[end][0]
+        // not considering driver to node time
     };
 
     let fitness_function = |path: &Vec<usize>| {
         let distance_travelleing = distance(path);
         let time_taken = time_taken(path);
 
-        E.powf(-distance_travelleing) * (1.0 / 1.0 + time_taken)
+        E.powf(-distance_travelleing/100.0) * (1.0 / 1.0 + time_taken)
     };
 
     let mut population = (0..population_size)

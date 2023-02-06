@@ -6,7 +6,7 @@ use super::genetic_algorithm::genetic_algorithm;
 
 use super::model::*;
 
-pub fn clustering(node: Node, routes: &mut Vec<Route> ,distance_matrix: &Vec<Vec<f32>>, time_matrix: &Vec<Vec<f32>>) {
+pub fn clustering(node: Node, routes: &mut Vec<Route> ,distance_matrix: &Vec<Vec<f32>>, time_matrix: &Vec<Vec<f32>>, rider_matrix: &Vec<Vec<f32>>) {
 	// most priority to distance travelled, add ratio too?
 	let mut min_increase = MAX;
 	let mut min_rider_index = 0;
@@ -17,7 +17,7 @@ pub fn clustering(node: Node, routes: &mut Vec<Route> ,distance_matrix: &Vec<Vec
 
     // does it matter of GA to have input in a particular order?
     temp_route.nodes.push(node);
-    let (cost, new_route) = genetic_algorithm(distance_matrix, time_matrix, &temp_route);
+    let (cost, new_route) = genetic_algorithm(distance_matrix, time_matrix, rider_matrix, rider_index, &temp_route);
 
     let nodes = new_route.iter().map(|&idx| temp_route.nodes.iter().find(|node| node.index == idx).unwrap().clone()).collect_vec();
     temp_route.nodes = nodes;
