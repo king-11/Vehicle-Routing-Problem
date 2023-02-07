@@ -1,20 +1,59 @@
 use std::collections::BTreeMap;
 
-#[derive(PartialEq, Eq, Clone, Copy)]
+use serde_derive::{Serialize, Deserialize};
+use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
+use serde_wasm_bindgen::*;
+
+use serde::{Serialize, Deserialize};
+
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
 pub enum DeliveryType {
     Pickup,
     Delivery,
 }
 
-#[derive(Clone, Copy)]
+#[wasm_bindgen]
+#[derive(Serialize, Deserialize, Clone, Copy)]
 pub struct Node {
     pub delivery_type: DeliveryType,
     pub index: usize,
 }
 
-#[derive(Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Route {
     pub nodes: Vec<Node>,
+}
+
+#[wasm_bindgen]
+pub fn send_routes_to_js(indexes: Vec<usize>, del_type: Vec<usize>) -> JsValue{
+    let mut all_nodes : Vec<Node> = Vec::new();
+    for i in 0..indexes.len() {
+        // Delivery
+        if del_type[i] == 1 {
+            let temp_node = Node{
+                delivery_type : DeliveryType::Delivery,
+                index: indexes[i],
+            };
+            all_nodes.push(temp_node);
+        }
+        else {
+            let temp_node = Node{
+                delivery_type : DeliveryType::Pickup,
+                index: indexes[i],
+            };
+            all_nodes.push(temp_node);
+        }
+    }
+    let route = Route {
+        nodes:all_nodes,
+    };
+    return serde_wasm_bindgen::to_value(&route).unwrap();
+}
+
+#[wasm_bindgen]
+pub fn receive_routes_from_js(val: JsValue) {
+    let routes: Route = serde_wasm_bindgen::from_value(val).unwrap();
 }
 
 impl Route {
