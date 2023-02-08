@@ -4,8 +4,6 @@ use serde_derive::{Deserialize, Serialize};
 
 use wasm_bindgen::{prelude::wasm_bindgen};
 
-use serde::{Deserialize, Serialize};
-
 #[wasm_bindgen]
 #[derive(Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
 pub enum DeliveryType {

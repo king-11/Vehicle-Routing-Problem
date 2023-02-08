@@ -6,8 +6,6 @@ use super::genetic_algorithm::genetic_algorithm;
 
 use super::model::*;
 
-use serde_wasm_bindgen::*;
-
 use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 
 #[wasm_bindgen]

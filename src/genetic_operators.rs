@@ -158,17 +158,3 @@ pub fn order_crossover(
 
     (child1, child2)
 }
-
-#[cfg(test)]
-mod tests {
-    use super::order_crossover;
-
-    #[test]
-    fn run_order() {
-        let parent1 = vec![1, 3, 4, 6, 0, 2, 7, 5];
-        let parent2 = vec![2, 3, 4, 0, 7, 6, 1, 5];
-        let (child1, child2) = order_crossover(&parent1, &parent2, Some(42));
-
-        dbg!(child1);
-    }
-}

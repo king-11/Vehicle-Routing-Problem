@@ -2,8 +2,6 @@ use itertools::Itertools;
 
 use crate::{clustering::clustering, model::Route, node_selection::radial_selection};
 
-use serde_wasm_bindgen::*;
-
 use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 
 pub fn route_mutate(
@@ -52,7 +50,7 @@ pub fn mutate_aux(
 
     let mut mutated_routes = routes.clone();
 
-    for i in 0..iterations {
+    for _ in 0..iterations {
         route_mutate(
             &mut mutated_routes,
             distance_matrix,
